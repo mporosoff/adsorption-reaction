@@ -82,6 +82,19 @@
       <div class="section-title" style="color:#ffd54f" id="live-title">At T = 800 K</div>
       <div class="live-box mono" id="live-values"></div>
     </div>
+    <div class="panel">
+      <div class="section-title">Rate Expressions</div>
+      <div class="fixed-box mono" style="line-height:2.0; font-size:11px;">
+        k<sub>r</sub> = A<sub>r</sub> · exp(−E<sub>a</sub>/RT)<br>
+        k<sub>a</sub> = A<sub>a</sub> · exp(0/RT)<br>
+        k<sub>d</sub> = A<sub>d</sub> · exp(−E<sub>d</sub>/RT)<br>
+        <span style="color:#8a8780;font-size:10px;">─────────────────────</span><br>
+        <span style="color:var(--green)">K</span> = k<sub>a</sub> / (k<sub>d</sub> + k<sub>r</sub>)<br>
+        <span style="color:var(--green)">θ</span> = KP / (1 + KP)<br>
+        <span style="color:var(--orange)">rate</span> = k<sub>r</sub> · θ<br>
+        <span style="color:var(--purple)">k<sub>eff</sub></span> = k<sub>r</sub> · K · P / (1 + KP)
+      </div>
+    </div>
   </div>
 
   <!-- Middle Column -->
@@ -145,7 +158,7 @@ function computeCurves() {
     const rate = kr * theta;
     T.push(t); rates.push(rate); thetas.push(theta);
     k2s.push((kr * K * params.pressure) / (1 + K * params.pressure));
-    invT.push(1 / t);
+    invT.push(1000 / t);
     lnRate.push(rate > 0 ? Math.log(rate) : -Infinity);
   }
   return { T, rates, thetas, k2s, invT, lnRate };
@@ -271,8 +284,8 @@ function drawPlot() {
 
   let xs, ys, xLabel, yLabel, color, dimColor, markerX;
   if (activeTab === 'arrhenius') {
-    xs = curves.invT; ys = curves.lnRate; xLabel = '1/T (K⁻¹)'; yLabel = 'ln(rate)';
-    color = C.orange; dimColor = 'rgba(255,112,67,0.2)'; markerX = 1 / params.temp;
+    xs = curves.invT; ys = curves.lnRate; xLabel = '1000/T (K⁻¹)'; yLabel = 'ln(rate)';
+    color = C.orange; dimColor = 'rgba(255,112,67,0.2)'; markerX = 1000 / params.temp;
   } else if (activeTab === 'coverage') {
     xs = curves.T; ys = curves.thetas; xLabel = 'T (K)'; yLabel = 'θ (coverage)';
     color = C.green; dimColor = 'rgba(102,187,106,0.15)'; markerX = params.temp;
