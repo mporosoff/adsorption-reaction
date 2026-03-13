@@ -74,12 +74,12 @@
     <div class="panel">
       <div class="section-title">Fixed</div>
       <div class="fixed-box mono">
-        A<sub>rxn</sub> = 10<sup>13</sup> s⁻¹ · A<sub>ads</sub> = 4×10<sup>5</sup> s⁻¹<br>
+        A<sub>rxn</sub> = 10<sup>11</sup> s⁻¹ · A<sub>ads</sub> = 10<sup>8</sup> s⁻¹<br>
         A<sub>des</sub> = 10<sup>13</sup> s⁻¹ · E<sub>ads</sub> = 0
       </div>
     </div>
     <div class="panel" id="live-panel">
-      <div class="section-title" style="color:#ffd54f" id="live-title">At T = 800 K</div>
+      <div class="section-title" style="color:#ffd54f" id="live-title">At T = 1000 K</div>
       <div class="live-box mono" id="live-values"></div>
     </div>
     <div class="panel">
@@ -113,7 +113,7 @@
   <div class="col-right">
     <div class="panel">
       <div class="panel-title">Surface View</div>
-      <div class="mono" style="font-size:11px;color:var(--muted);margin-bottom:12px" id="surface-label">8×8 lattice at T = 800 K</div>
+      <div class="mono" style="font-size:11px;color:var(--muted);margin-bottom:12px" id="surface-label">8×8 lattice at T = 1000 K</div>
       <canvas id="surface-canvas" style="border-radius:8px"></canvas>
       <div class="legend">
         <div class="legend-item"><div class="legend-sq" style="background:var(--empty)"></div><span class="mono">Empty *</span></div>
@@ -139,7 +139,7 @@ const C = { accent:'#4fc3f7', green:'#66bb6a', orange:'#ff7043', purple:'#ab47bc
             muted:'#8a8780', text:'#e8e6e1', border:'#262a36', grid:'rgba(255,255,255,0.06)',
             empty:'#2a2e3a', metal:'#5c6370', metalLight:'#6e7581' };
 
-let params = { pressure: 760, eRxn: 10, heatAds: 20, temp: 800 };
+let params = { pressure: 760, eRxn: 5, heatAds: 15, temp: 1000 };
 const tMin = 500, tMax = 2000;
 let activeTab = 'arrhenius';
 
@@ -150,8 +150,8 @@ function computeCurves() {
   const T = [], rates = [], thetas = [], k2s = [], invT = [], lnRate = [];
   for (let t = tMin; t <= tMax; t += 10) {
     const rt = R * t;
-    const kr = 1e13 * Math.exp(-params.eRxn / rt);
-    const ka = 4e5;
+    const kr = 1e11 * Math.exp(-params.eRxn / rt);
+    const ka = 1e8;
     const kd = 1e13 * Math.exp(-params.heatAds / rt);
     const K = ka / (kd + kr);
     const theta = (K * params.pressure) / (1 + K * params.pressure);
@@ -166,8 +166,8 @@ function computeCurves() {
 
 function computeAtTemp() {
   const rt = R * params.temp;
-  const kr = 1e13 * Math.exp(-params.eRxn / rt);
-  const ka = 4e5;
+  const kr = 1e11 * Math.exp(-params.eRxn / rt);
+  const ka = 1e8;
   const kd = 1e13 * Math.exp(-params.heatAds / rt);
   const K = ka / (kd + kr);
   const theta = (K * params.pressure) / (1 + K * params.pressure);
