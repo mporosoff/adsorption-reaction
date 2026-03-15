@@ -20,9 +20,10 @@
   .header p { font-size: 12px; color: var(--muted); margin-top: 4px; }
   .layout { max-width: 1200px; margin: 0 auto; display: flex; gap: 16px; flex-wrap: wrap; }
   .panel { background: var(--panel); border-radius: 12px; border: 1px solid var(--border); padding: 16px; }
-  .col-left { width: 270px; flex-shrink: 0; display: flex; flex-direction: column; gap: 14px; }
-  .col-mid { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
-  .col-right { width: 300px; flex-shrink: 0; }
+  .col-left { width: 300px; flex-shrink: 0; display: flex; flex-direction: column; gap: 14px; }
+  .col-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+  .bottom-row { width: 100%; display: flex; gap: 14px; }
+  .bottom-row .panel { flex: 1; min-width: 0; }
   .section-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 14px; }
   .panel-title { font-size: 14px; font-weight: 600; margin-bottom: 10px; }
 
@@ -53,7 +54,11 @@
 
   @media (max-width: 900px) {
     .layout { flex-direction: column; }
-    .col-left, .col-mid, .col-right { width: 100%; min-width: 0; }
+    .col-left, .col-main, .bottom-row { width: 100%; min-width: 0; }
+    .bottom-row { flex-direction: column; }
+    .item-sliders { order: 1; }
+    .col-main { order: 2; }
+    .item-info { order: 3; }
     .header h1 { font-size: 18px; }
     body { padding: 12px 10px; }
     .panel { padding: 14px 12px; }
@@ -71,22 +76,56 @@
 </div>
 
 <div class="layout">
-  <!-- Left Column -->
-  <div class="col-left">
+  <!-- Left: Sliders + Surface stacked -->
+  <div class="col-left item-sliders">
     <div class="panel" id="controls">
       <div class="section-title">Parameters</div>
       <div id="sliders"></div>
     </div>
     <div class="panel">
-      <div class="section-title">Fixed</div>
-      <div class="fixed-box mono">
-        A<sub>rxn</sub> = 10<sup>11</sup> s⁻¹ · A<sub>ads</sub> = 10<sup>8</sup> s⁻¹<br>
-        A<sub>des</sub> = 10<sup>13</sup> s⁻¹ · E<sub>ads</sub> = 0
+      <div class="panel-title">Surface View</div>
+      <div class="mono" style="font-size:11px;color:var(--muted);margin-bottom:12px" id="surface-label">8×8 lattice at T = 1000 K</div>
+      <canvas id="surface-canvas"></canvas>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-sq" style="background:var(--empty)"></div><span class="mono">Empty *</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div><span class="mono">A*</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div><span class="mono">TS ‡</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div><span class="mono">B(g) ↑</span></div>
+      </div>
+      <div class="flow-box mono" style="white-space:nowrap">
+        <span style="color:var(--accent)">●</span> A lands →
+        <span style="color:var(--orange)">●</span> reacts →
+        <span style="color:var(--purple)">●</span> B(g) desorbs
       </div>
     </div>
-    <div class="panel" id="live-panel">
+  </div>
+
+  <!-- Right: PES + Plots, full remaining width -->
+  <div class="col-main">
+    <div class="panel">
+      <div class="panel-title">Potential Energy Diagram</div>
+      <svg id="energy-svg" viewBox="0 0 700 260" preserveAspectRatio="xMidYMid meet" style="overflow:visible; width:100%; height:auto;"></svg>
+    </div>
+    <div class="panel">
+      <div class="tabs" id="plot-tabs"></div>
+      <svg id="plot-svg" viewBox="0 0 700 300" preserveAspectRatio="xMidYMid meet" style="overflow:visible; width:100%; height:auto;"></svg>
+    </div>
+  </div>
+
+  <!-- Bottom row: three info panels -->
+  <div class="bottom-row item-info">
+    <div class="panel">
       <div class="section-title" style="color:#ffd54f" id="live-title">At T = 1000 K</div>
       <div class="live-box mono" id="live-values"></div>
+    </div>
+    <div class="panel">
+      <div class="section-title">Fixed Parameters</div>
+      <div class="fixed-box mono">
+        A<sub>rxn</sub> = 10<sup>11</sup> s⁻¹<br>
+        A<sub>ads</sub> = 10<sup>8</sup> s⁻¹<br>
+        A<sub>des</sub> = 10<sup>13</sup> s⁻¹<br>
+        E<sub>ads</sub> = 0
+      </div>
     </div>
     <div class="panel">
       <div class="section-title">Rate Expressions</div>
@@ -99,38 +138,6 @@
         <span style="color:var(--green)">θ</span> = KP / (1 + KP)<br>
         <span style="color:var(--orange)">rate</span> = k<sub>r</sub> · θ<br>
         <span style="color:var(--purple)">k<sub>eff</sub></span> = k<sub>r</sub> · K · P / (1 + KP)
-      </div>
-    </div>
-  </div>
-
-  <!-- Middle Column -->
-  <div class="col-mid">
-    <div class="panel">
-      <div class="panel-title">Potential Energy Diagram</div>
-      <svg id="energy-svg" viewBox="0 0 520 240" preserveAspectRatio="xMidYMid meet" style="overflow:visible; width:100%; height:auto;"></svg>
-    </div>
-    <div class="panel">
-      <div class="tabs" id="plot-tabs"></div>
-      <svg id="plot-svg" viewBox="0 0 520 260" preserveAspectRatio="xMidYMid meet" style="overflow:visible; width:100%; height:auto;"></svg>
-    </div>
-  </div>
-
-  <!-- Right Column -->
-  <div class="col-right">
-    <div class="panel">
-      <div class="panel-title">Surface View</div>
-      <div class="mono" style="font-size:11px;color:var(--muted);margin-bottom:12px" id="surface-label">8×8 lattice at T = 1000 K</div>
-      <canvas id="surface-canvas"></canvas>
-      <div class="legend">
-        <div class="legend-item"><div class="legend-sq" style="background:var(--empty)"></div><span class="mono">Empty *</span></div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div><span class="mono">A*</span></div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div><span class="mono">TS ‡</span></div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div><span class="mono">B(g) ↑</span></div>
-      </div>
-      <div class="flow-box mono">
-        <span style="color:var(--accent)">●</span> A lands →
-        <span style="color:var(--orange)">●</span> reacts →
-        <span style="color:var(--purple)">●</span> B(g) desorbs ↑
       </div>
     </div>
   </div>
@@ -209,7 +216,7 @@ function fmt(n) {
 function drawEnergy() {
   const svg = document.getElementById('energy-svg');
   svg.innerHTML = '';
-  const W = 520, H = 240;
+  const W = 700, H = 260;
   const pad = { top: 30, right: 30, bottom: 30, left: 50 };
   const w = W - pad.left - pad.right, h = H - pad.top - pad.bottom;
 
@@ -283,7 +290,7 @@ function drawEnergy() {
 function drawPlot() {
   const svg = document.getElementById('plot-svg');
   svg.innerHTML = '';
-  const W = 520, H = 260;
+  const W = 700, H = 300;
   const pad = { top: 20, right: 25, bottom: 45, left: 70 };
   const w = W - pad.left - pad.right, h = H - pad.top - pad.bottom;
   const curves = computeCurves();
