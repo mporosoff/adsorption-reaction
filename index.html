@@ -21,7 +21,7 @@
   .layout { max-width: 1200px; margin: 0 auto; display: flex; gap: 16px; flex-wrap: wrap; }
   .panel { background: var(--panel); border-radius: 12px; border: 1px solid var(--border); padding: 16px; }
   .col-left { width: 270px; flex-shrink: 0; display: flex; flex-direction: column; gap: 14px; }
-  .col-mid { flex: 1; min-width: 360px; display: flex; flex-direction: column; gap: 14px; }
+  .col-mid { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
   .col-right { width: 300px; flex-shrink: 0; }
   .section-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 14px; }
   .panel-title { font-size: 14px; font-weight: 600; margin-bottom: 10px; }
@@ -32,9 +32,9 @@
   .slider-label { font-size: 13px; font-weight: 500; }
   .slider-value { font-size: 12px; padding: 2px 8px; border-radius: 4px; }
   .slider-range { display: flex; justify-content: space-between; margin-top: 2px; font-size: 10px; color: var(--muted); }
-  input[type=range] { width: 100%; height: 6px; -webkit-appearance: none; appearance: none; border-radius: 3px; outline: none; cursor: pointer; }
-  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #fff; border: 2px solid var(--accent); cursor: pointer; margin-top: -5px; box-shadow: 0 0 6px rgba(79,195,247,0.4); }
-  input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 2px solid var(--accent); cursor: pointer; }
+  input[type=range] { width: 100%; height: 6px; -webkit-appearance: none; appearance: none; border-radius: 3px; outline: none; cursor: pointer; touch-action: manipulation; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #fff; border: 2px solid var(--accent); cursor: pointer; margin-top: -7px; box-shadow: 0 0 6px rgba(79,195,247,0.4); }
+  input[type=range]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 2px solid var(--accent); cursor: pointer; }
 
   /* Tabs */
   .tabs { display: flex; gap: 4px; margin-bottom: 14px; }
@@ -53,8 +53,14 @@
 
   @media (max-width: 900px) {
     .layout { flex-direction: column; }
-    .col-left, .col-right { width: 100%; }
+    .col-left, .col-mid, .col-right { width: 100%; min-width: 0; }
+    .header h1 { font-size: 18px; }
+    body { padding: 12px 10px; }
+    .panel { padding: 14px 12px; }
   }
+  /* Make SVGs and canvas responsive */
+  #energy-svg, #plot-svg { width: 100%; height: auto; display: block; }
+  #surface-canvas { display: block; border-radius: 8px; }
 </style>
 </head>
 <body>
@@ -101,11 +107,11 @@
   <div class="col-mid">
     <div class="panel">
       <div class="panel-title">Potential Energy Diagram</div>
-      <svg id="energy-svg" width="520" height="240" style="overflow:visible"></svg>
+      <svg id="energy-svg" viewBox="0 0 520 240" preserveAspectRatio="xMidYMid meet" style="overflow:visible; width:100%; height:auto;"></svg>
     </div>
     <div class="panel">
       <div class="tabs" id="plot-tabs"></div>
-      <svg id="plot-svg" width="520" height="260" style="overflow:visible"></svg>
+      <svg id="plot-svg" viewBox="0 0 520 260" preserveAspectRatio="xMidYMid meet" style="overflow:visible; width:100%; height:auto;"></svg>
     </div>
   </div>
 
@@ -114,7 +120,7 @@
     <div class="panel">
       <div class="panel-title">Surface View</div>
       <div class="mono" style="font-size:11px;color:var(--muted);margin-bottom:12px" id="surface-label">8×8 lattice at T = 1000 K</div>
-      <canvas id="surface-canvas" style="border-radius:8px"></canvas>
+      <canvas id="surface-canvas"></canvas>
       <div class="legend">
         <div class="legend-item"><div class="legend-sq" style="background:var(--empty)"></div><span class="mono">Empty *</span></div>
         <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div><span class="mono">A*</span></div>
@@ -409,7 +415,16 @@ function surfaceLoop(timestamp) {
   const canvas = document.getElementById('surface-canvas');
   const ctx = canvas.getContext('2d');
   const dpr = window.devicePixelRatio || 1;
-  if (canvas.width !== cvW * dpr) { canvas.width = cvW * dpr; canvas.height = cvH * dpr; canvas.style.width = cvW + 'px'; canvas.style.height = cvH + 'px'; ctx.scale(dpr, dpr); }
+  if (canvas.width !== cvW * dpr) {
+    canvas.width = cvW * dpr;
+    canvas.height = cvH * dpr;
+    // Let CSS handle responsive width; set aspect ratio via attribute
+    canvas.style.width = '100%';
+    canvas.style.maxWidth = cvW + 'px';
+    canvas.style.height = 'auto';
+    canvas.style.aspectRatio = cvW + ' / ' + cvH;
+    ctx.scale(dpr, dpr);
+  }
   ctx.clearRect(0, 0, cvW, cvH);
 
   // Incoming
