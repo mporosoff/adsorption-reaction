@@ -54,11 +54,13 @@
 
   @media (max-width: 900px) {
     .layout { flex-direction: column; }
-    .col-left, .col-main, .bottom-row { width: 100%; min-width: 0; }
+    .col-left { width: 100%; display: contents; }
+    .col-main, .bottom-row { width: 100%; min-width: 0; }
     .bottom-row { flex-direction: column; }
     .item-sliders { order: 1; }
     .col-main { order: 2; }
-    .item-info { order: 3; }
+    .item-surface { order: 3; }
+    .item-info { order: 4; }
     .header h1 { font-size: 18px; }
     body { padding: 12px 10px; }
     .panel { padding: 14px 12px; }
@@ -76,13 +78,13 @@
 </div>
 
 <div class="layout">
-  <!-- Left: Sliders + Surface stacked -->
-  <div class="col-left item-sliders">
-    <div class="panel" id="controls">
+  <!-- Left on desktop: Sliders + Surface stacked via subgrid -->
+  <div class="col-left">
+    <div class="panel item-sliders" id="controls">
       <div class="section-title">Parameters</div>
       <div id="sliders"></div>
     </div>
-    <div class="panel">
+    <div class="panel item-surface">
       <div class="panel-title">Surface View</div>
       <div class="mono" style="font-size:11px;color:var(--muted);margin-bottom:12px" id="surface-label">8×8 lattice at T = 1000 K</div>
       <canvas id="surface-canvas"></canvas>
@@ -90,7 +92,7 @@
         <div class="legend-item"><div class="legend-sq" style="background:var(--empty)"></div><span class="mono">Empty *</span></div>
         <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div><span class="mono">A*</span></div>
         <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div><span class="mono">TS ‡</span></div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div><span class="mono">B(g)</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div><span class="mono">B(g) ↑</span></div>
       </div>
       <div class="flow-box mono" style="white-space:nowrap">
         <span style="color:var(--accent)">●</span> A lands →
